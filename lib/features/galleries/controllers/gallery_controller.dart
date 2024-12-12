@@ -4,20 +4,19 @@ import 'package:awesome_app/features/galleries/repositories/gallery_repository.d
 import 'package:get/get.dart';
 
 class GalleryController extends GetxController{
-  final GalleryRepository galleryRepository;
 
-  GalleryController(this.galleryRepository);
-
-  final RxList<PhotoModel> photos = <PhotoModel>[].obs;
-  final RxBool isLoading = false.obs;
-  final RxString error = ''.obs;
-  final RxInt currentPage = 1.obs;
+  final GalleryRepository galleryRepository = Get.put(GalleryRepository());
 
   @override
   void onInit() {
     super.onInit();
     fetchCuratedPhotos();
   }
+
+  var photos = <PhotoModel>[].obs;
+  var isLoading = true.obs;
+  var error = ''.obs;
+  var currentPage = 1.obs;
 
   Future<void> fetchCuratedPhotos() async {
     try{

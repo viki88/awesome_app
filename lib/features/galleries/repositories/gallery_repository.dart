@@ -1,12 +1,11 @@
 import 'package:awesome_app/core/constants/api_constant.dart';
+import 'package:awesome_app/core/service/dio_service.dart';
 import 'package:awesome_app/features/galleries/models/photo_model.dart';
 import 'package:dio/dio.dart';
 
 class GalleryRepository{
 
-  final Dio dio;
-
-  GalleryRepository(this.dio);
+  final Dio dio = DioService.createInstance();
 
   Future<List<PhotoModel>> fetchCuratedPhotos({
     int perPage = 15,

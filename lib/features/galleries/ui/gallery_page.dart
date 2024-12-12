@@ -1,82 +1,62 @@
 import 'package:awesome_app/features/galleries/controllers/gallery_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_modular/flutter_modular.dart';
 import 'package:get/get.dart';
 
 class GalleryPage extends StatelessWidget{
+  const GalleryPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Modular.get<GalleryController>();
+    final controller = Get.put(GalleryController());
 
-    return SafeArea(
-        child: Scaffold(
-            body: NestedScrollView(
-              headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled){
-                return <Widget>[
-                  SliverAppBar(
-                    actions: [
-                      IconButton(
-                        icon: const Icon(Icons.more_vert, color: Colors.white),
-                          onPressed: (){}
-                      )
-                    ],
-                    backgroundColor: Colors.green,
-                    title: const Text(
-                      'Awesome App',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600
-                      ),
+    return Scaffold(
+        body:
+        CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              actions: [
+                IconButton(
+                    icon: const Icon(Icons.more_vert, color: Colors.white),
+                    onPressed: (){}
+                )
+              ],
+              pinned: true,
+              flexibleSpace: const FlexibleSpaceBar(
+                title: Text(
+                  'Awesome App',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600
+                  ),
+                ),
+              ),
+              backgroundColor: Colors.green,
+            ),
+            Obx((){
+              // if(controller.isLoading.value){
+              //   return const Center( child: CircularProgressIndicator());
+              // }else {
+                return SliverGrid(
+                    delegate: SliverChildBuilderDelegate(
+                        childCount: controller.photos.length,
+                            (context, index){
+                          final photo = controller.photos[index];
+                          return Image.network(
+                            photo.mediumUrl,
+                            fit: BoxFit.cover,
+                          );
+                        }
                     ),
-                  )
-                ];
-              },
-              body: Obx(() {
-                if(controller.isLoading.value && controller.photos.isEmpty){
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-
-                if(controller.error.value.isNotEmpty){
-                  return Center(
-                    child: Text(controller.error.value),
-                  );
-                }
-
-                return GridView.builder(
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
-                      crossAxisSpacing: 4,
-                      mainAxisSpacing: 4
-                    ),
-                    itemCount: controller.photos.length + 1,
-                    itemBuilder: (context, index) {
-                      if(index == controller.photos.length){
-                        controller.fetchCuratedPhotos();
-                        return const Center(child: CircularProgressIndicator());
-                      }
-
-                      final photo = controller.photos[index];
-                      return Image.network(
-                        photo.mediumUrl,
-                        fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress){
-                          if(loadingProgress == null) return child;
-                          return Center(
-                            child: CircularProgressIndicator(
-                              value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes !
-                              : null ,
-                            ),
-                          );
-                        },
-                      );
-                    }
+                        mainAxisSpacing: 8,
+                        crossAxisSpacing: 8,
+                        childAspectRatio: 1
+                    )
                 );
-              }),
-            )
+              //}
+            })
+          ],
         )
     );
   }
