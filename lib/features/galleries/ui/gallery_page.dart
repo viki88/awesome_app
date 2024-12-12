@@ -17,6 +17,7 @@ class GalleryPage extends StatelessWidget{
         RefreshIndicator(
             onRefresh: controller.refreshFetch,
           child: CustomScrollView(
+            controller: controller.scrollController,
             slivers: [
               SliverAppBar(
                 actions: [
@@ -43,11 +44,11 @@ class GalleryPage extends StatelessWidget{
                 backgroundColor: Colors.green,
               ),
               Obx((){
-                if(controller.isLoading.value){
-                  return SliverToBoxAdapter(
-                      child: Container()
-                  );
-                }
+                // if(controller.isLoading.value){
+                //   return SliverToBoxAdapter(
+                //       child: Container()
+                //   );
+                // }
                   if(toggleListController.isGridView.value){
                     return SliverGrid(
                         delegate: SliverChildBuilderDelegate(
@@ -81,15 +82,22 @@ class GalleryPage extends StatelessWidget{
                       childCount: controller.photos.length,
                         (context, index){
                           final photo = controller.photos[index];
-                          return Padding(
+                          return GestureDetector(
+                            onTap: (){
+                              Get.to(()=> DetailGalleryPage(photoModel: photo));
+                            },
+                            child: Padding(
                               padding: const EdgeInsets.all(4),
                               child: Row(
                                 children: [
-                                  Image.network(
-                                    photo.smallUrl,
-                                    width: 100,
-                                    height: 100,
-                                    fit: BoxFit.cover,
+                                  Hero(
+                                      tag: 'gallery_tag$index',
+                                      child: Image.network(
+                                        photo.smallUrl,
+                                        width: 100,
+                                        height: 100,
+                                        fit: BoxFit.cover,
+                                      )
                                   ),
                                   const SizedBox(width: 16),
                                   Expanded(
@@ -97,16 +105,16 @@ class GalleryPage extends StatelessWidget{
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                              photo.photographer,
+                                            photo.photographer,
                                             style: const TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w800
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w800
                                             ),
                                           ),
                                           Text(
-                                              photo.photographerUrl,
+                                            photo.photographerUrl,
                                             style: const TextStyle(
-                                              fontStyle: FontStyle.italic
+                                                fontStyle: FontStyle.italic
                                             ),
                                           )
                                         ],
@@ -114,6 +122,7 @@ class GalleryPage extends StatelessWidget{
                                   )
                                 ],
                               ),
+                            ),
                           );
                         }
                     ));
