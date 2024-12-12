@@ -5,6 +5,7 @@ class PhotoModel{
   final String originalUrl;
   final String mediumUrl;
   final String smallUrl;
+  final String alt;
 
   PhotoModel({
     required this.id,
@@ -12,7 +13,8 @@ class PhotoModel{
     required this.photographerUrl,
     required this.originalUrl,
     required this.mediumUrl,
-    required this.smallUrl
+    required this.smallUrl,
+    required this.alt
   });
 
   factory PhotoModel.fromJson(Map<String, dynamic> json){
@@ -22,7 +24,8 @@ class PhotoModel{
         photographerUrl: json['photographer_url'],
         originalUrl: json['src']['original'],
         mediumUrl: json['src']['medium'],
-        smallUrl: json['src']['small']
+        smallUrl: json['src']['small'],
+        alt: json['alt']
     );
   }
 

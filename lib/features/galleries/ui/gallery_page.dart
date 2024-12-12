@@ -1,5 +1,7 @@
 import 'package:awesome_app/features/galleries/controllers/gallery_controller.dart';
 import 'package:awesome_app/features/galleries/controllers/toggle_list_controller.dart';
+import 'package:awesome_app/features/galleries/ui/detail_gallery_page.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -52,9 +54,18 @@ class GalleryPage extends StatelessWidget{
                             childCount: controller.photos.length,
                                 (context, index){
                               final photo = controller.photos[index];
-                              return Image.network(
-                                photo.mediumUrl,
-                                fit: BoxFit.cover,
+                              return GestureDetector(
+                                onTap: (){
+                                  Get.to(() => DetailGalleryPage(photoModel: photo));
+                                },
+                                child: Hero(
+                                    tag: 'gallery_tag$index',
+                                    child: CachedNetworkImage(
+                                      imageUrl: photo.mediumUrl,
+                                      fit: BoxFit.cover,
+                                      placeholder: (_,url) => const Icon(Icons.image_rounded),
+                                      errorWidget: (context, url, error) => const Icon(Icons.error),
+                                    )),
                               );
                             }
                         ),
