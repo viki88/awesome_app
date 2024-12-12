@@ -14,14 +14,17 @@ class GalleryController extends GetxController{
   }
 
   var photos = <PhotoModel>[].obs;
-  var isLoading = true.obs;
+  var isLoading = false.obs;
   var error = ''.obs;
   var currentPage = 1.obs;
 
   Future<void> fetchCuratedPhotos() async {
     try{
       isLoading.value = true;
-
+      // Get.dialog(
+      //   const Center(child: CircularProgressIndicator()),
+      //   barrierDismissible: false
+      // );
       final fetchedPhotos = await galleryRepository.fetchCuratedPhotos(
           page: currentPage.value,
           perPage: ApiConstant.pexelDefaultPerPageCount
@@ -34,10 +37,19 @@ class GalleryController extends GetxController{
       }
 
       currentPage.value++;
+      // if(Get.isDialogOpen == true) Get.back();
     } catch (e) {
       error.value = e.toString();
     } finally{
       isLoading.value = false;
+      // Get.back();
     }
   }
+
+  Future<void> refreshFetch() async{
+    return fetchCuratedPhotos();
+  }
+
+
+
 }

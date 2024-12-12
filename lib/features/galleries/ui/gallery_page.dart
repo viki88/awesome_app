@@ -1,62 +1,117 @@
 import 'package:awesome_app/features/galleries/controllers/gallery_controller.dart';
+import 'package:awesome_app/features/galleries/controllers/toggle_list_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class GalleryPage extends StatelessWidget{
-  const GalleryPage({super.key});
+  final GalleryController controller = Get.put(GalleryController());
+  final ToggleListController toggleListController = Get.put(ToggleListController());
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(GalleryController());
 
     return Scaffold(
         body:
-        CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              actions: [
-                IconButton(
-                    icon: const Icon(Icons.more_vert, color: Colors.white),
-                    onPressed: (){}
-                )
-              ],
-              pinned: true,
-              flexibleSpace: const FlexibleSpaceBar(
-                title: Text(
-                  'Awesome App',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600
+        RefreshIndicator(
+            onRefresh: controller.refreshFetch,
+          child: CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                actions: [
+                  IconButton(
+                      icon: Obx(() => Icon(
+                        color: Colors.white,
+                          !toggleListController.isGridView.value ? Icons.grid_view : Icons.view_list
+                      )),
+                      onPressed: (){
+                        toggleListController.toggleView();
+                      }
+                  )
+                ],
+                pinned: true,
+                flexibleSpace: const FlexibleSpaceBar(
+                  title: Text(
+                    'Awesome App',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600
+                    ),
                   ),
                 ),
+                backgroundColor: Colors.green,
               ),
-              backgroundColor: Colors.green,
-            ),
-            Obx((){
-              // if(controller.isLoading.value){
-              //   return const Center( child: CircularProgressIndicator());
-              // }else {
-                return SliverGrid(
-                    delegate: SliverChildBuilderDelegate(
-                        childCount: controller.photos.length,
-                            (context, index){
+              Obx((){
+                if(controller.isLoading.value){
+                  return SliverToBoxAdapter(
+                      child: Container()
+                  );
+                }
+                  if(toggleListController.isGridView.value){
+                    return SliverGrid(
+                        delegate: SliverChildBuilderDelegate(
+                            childCount: controller.photos.length,
+                                (context, index){
+                              final photo = controller.photos[index];
+                              return Image.network(
+                                photo.mediumUrl,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                        ),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 8,
+                            crossAxisSpacing: 8,
+                            childAspectRatio: 1
+                        )
+                    );
+                  }else{
+                    return SliverList(delegate: SliverChildBuilderDelegate(
+                      childCount: controller.photos.length,
+                        (context, index){
                           final photo = controller.photos[index];
-                          return Image.network(
-                            photo.mediumUrl,
-                            fit: BoxFit.cover,
+                          return Padding(
+                              padding: const EdgeInsets.all(4),
+                              child: Row(
+                                children: [
+                                  Image.network(
+                                    photo.smallUrl,
+                                    width: 100,
+                                    height: 100,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                              photo.photographer,
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w800
+                                            ),
+                                          ),
+                                          Text(
+                                              photo.photographerUrl,
+                                            style: const TextStyle(
+                                              fontStyle: FontStyle.italic
+                                            ),
+                                          )
+                                        ],
+                                      )
+                                  )
+                                ],
+                              ),
                           );
                         }
-                    ),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 8,
-                        crossAxisSpacing: 8,
-                        childAspectRatio: 1
-                    )
-                );
-              //}
-            })
-          ],
+                    ));
+                  }
+                }
+              ),
+
+            ],
+          ),
         )
     );
   }
